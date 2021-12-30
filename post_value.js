@@ -28,7 +28,7 @@ function goPython()
 (async () => {
   const browser = await puppeteer.launch(
 
-    {headless : false,
+    {headless :  process.platform === "linux",
 
       args: [`--window-size=1500,900`,`--disable-web-security`]}
 
