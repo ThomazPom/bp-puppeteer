@@ -12,7 +12,9 @@ var FormData = require('form-data');
 // Alternative hack to get the same FormData instance as node-fetch
 // const FormData = (await new Response(new URLSearchParams()).formData()).constructor
 
-
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 
 function goPython()
@@ -28,8 +30,8 @@ function goPython()
 (async () => {
   const browser = await puppeteer.launch(
 
-    {headless : false,
 
+    {headless :  process.platform === "linux",
       args: [`--window-size=1500,900`,`--disable-web-security`]}
 
       );
@@ -79,6 +81,7 @@ const fse = require('fs-extra');
       );
   
 
+  await timeout(1000)
   //typeLogin
   await page.evaluate((id,pass,indexes) => {
     var elem = frames[0].window.document.querySelector("#val_cel_identifiant")
