@@ -20,7 +20,9 @@ var FormData = require('formdata-node').FormData;
 // Alternative hack to get the same FormData instance as node-fetch
 // const FormData = (await new Response(new URLSearchParams()).formData()).constructor
 
-
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 
 function goPython()
@@ -87,6 +89,7 @@ const fse = require('fs-extra');
       );
   
 
+  await timeout(1000)
   //typeLogin
   await page.evaluate((id,pass,indexes) => {
     var elem = frames[0].window.document.querySelector("#val_cel_identifiant")
