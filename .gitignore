@@ -1,7 +1,7 @@
 ##Program files
 #captcha_path
 captcha.png
-
+.vscode/
 ### Node ###
 # Logs
 logs

@@ -1,4 +1,11 @@
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
+
+const puppeteer = require('puppeteer-extra')
+
+// add stealth plugin and use defaults (all evasion techniques)
+const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+puppeteer.use(StealthPlugin())
+
 const child_process = require('child_process');
 console.log(process.argv);
 const path = require('path');
@@ -7,7 +14,8 @@ captcha_path="./captcha.png"
 
 fetch = require('node-fetch-commonjs');
 
-var FormData = require('form-data');
+//var FormData = require('form-data'); // Obsolete
+var FormData = require('formdata-node').FormData;
 
 // Alternative hack to get the same FormData instance as node-fetch
 // const FormData = (await new Response(new URLSearchParams()).formData()).constructor
@@ -30,7 +38,7 @@ function goPython()
 
     {headless :  process.platform === "linux",
 
-      args: [`--window-size=1500,900`,`--disable-web-security`]}
+      args: [`--disable-web-security`]}
 
       );
 
@@ -89,15 +97,10 @@ const fse = require('fs-extra');
     })
     frames[0].window.document.querySelector("#valider").click();
   },process.argv[2],process.argv[3],goPython())
-
-
-  await page.waitForSelector('.amount-euro'); 
-
-
-  await page.evaluate(() => {
-
-    document.querySelector(".amount-euro").click();
-  })
+  await page.waitForSelector('.account-data a');
+  //await page.click(".amount-euro");
+  await page.goto(await page.evaluate(z =>  document.querySelector(".account-data a").href))
+  // console.log(await page.evaluate(z =>  document.body.innerHTML));
   await page.waitForSelector('.icon-ic_interface_download'); 
 
   await page.evaluate(() => {

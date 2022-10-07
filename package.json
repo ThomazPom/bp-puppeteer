@@ -6,6 +6,9 @@
   "form-data": "^4.0.0",
   
     
+  "formdata-node": "^4.3.2",
+  
+    
   "fs-extra": "^10.0.0",
   
     
@@ -15,7 +18,13 @@
   "node-fetch-commonjs": "^3.1.1",
   
     
-  "puppeteer": "^13.0.1"
+  "puppeteer": "^13.7.0",
+  
+    
+  "puppeteer-extra": "^3.3.4",
+  
+    
+  "puppeteer-extra-plugin-stealth": "^2.11.1"
   
   }
 }
