@@ -1,22 +1,23 @@
 // const puppeteer = require('puppeteer');
-
-const puppeteer = require('puppeteer-extra')
-
+import { executablePath } from 'puppeteer';
+//const puppeteer = require('puppeteer-extra')
+import puppeteer from 'puppeteer-extra'
 // add stealth plugin and use defaults (all evasion techniques)
-const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 puppeteer.use(StealthPlugin())
 
-const child_process = require('child_process');
+import  child_process from 'child_process';
 console.log(process.argv);
-const path = require('path');
-captcha_path="./captcha.png"
+
+import path from 'path';
+let captcha_path="./captcha.png"
 
 
-fetch = require('node-fetch-commonjs');
-
+import fetch from 'node-fetch';
+import fse from 'fs-extra'
 //var FormData = require('form-data'); // Obsolete
-var FormData = require('formdata-node').FormData;
-
+//var FormData = require('formdata-node').FormData;
+import {FormData} from "formdata-node"
 // Alternative hack to get the same FormData instance as node-fetch
 // const FormData = (await new Response(new URLSearchParams()).formData()).constructor
 
@@ -52,7 +53,7 @@ async function get_temp_virements_libelles(page,text)
 
 function goPython()
 {
-  out_python = child_process.execSync(process.argv[4] +" "+ process.argv[5]+" "+ path.resolve(captcha_path),
+  let out_python = child_process.execSync(process.argv[4] +" "+ process.argv[5]+" "+ path.resolve(captcha_path),
   {
     cwd:path.dirname(process.argv[5])
   }).toString();
@@ -66,7 +67,7 @@ function goPython()
   const browser = await puppeteer.launch(
 
     {headless :  process.platform === "linux",
-
+    executablePath: executablePath(),
       args: [`--disable-web-security`]}
 
       );
@@ -80,7 +81,6 @@ function goPython()
     if (request.url().includes('OstBrokerWeb/loginform?imgid=allunifie1')){
       const text = await response.text();
         
-const fse = require('fs-extra');
     // save all the data to SOMEWHERE_TO_STORE
     await fse.outputFile(captcha_path, await response.buffer());       
 
