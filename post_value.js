@@ -23,7 +23,32 @@ var FormData = require('formdata-node').FormData;
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+async function get_temp_virements_libelles(page,text)
+{
+  
+  try{
+      await page.evaluate(z=>{
+        [...document.querySelectorAll("a")].filter(a=>a.outerHTML.includes('virements') && a.outerHTML.includes('storique'))[0].click()
+      })
+      await timeout(3000);        
+      await page.evaluate(z=>{
+        [...document.querySelectorAll("a")].filter(a=>a.textContent.includes('exécutés'))[0].click()
+      })
+      
+      await timeout(3000);
+      (await page.evaluate(z=>{
+        document.querySelectorAll(".sr-only").forEach(z=>z.remove());
+        return [...document.querySelectorAll(".block-virement .row-list>:nth-child(4)")].map(x=>x.textContent.trim());
+      })) .forEach(libelle=>{
+        text=text.replace('VIREMENT INSTANTANE DEBIT',"V.INSTANT "+libelle);
+      });
+      
+  }
+  catch(e){
+    console.log("Echec du rétablissement des textes des virements intantanés",e);
+  }
+  return text;
+}
 
 function goPython()
 {
@@ -31,6 +56,8 @@ function goPython()
   {
     cwd:path.dirname(process.argv[5])
   }).toString();
+  console.log("Python output:")
+  console.log(JSON.parse(out_python));
   return JSON.parse(out_python)
 }
 
@@ -46,17 +73,19 @@ function goPython()
 
   const page = await browser.newPage();
   
+  
   page.on('response', async(response) => {
     const request = response.request();
     console.log(request.url())
     if (request.url().includes('OstBrokerWeb/loginform?imgid=allunifie1')){
       const text = await response.text();
-//        console.log("HELLO",request.url(),text);
-
+        
 const fse = require('fs-extra');
     // save all the data to SOMEWHERE_TO_STORE
     await fse.outputFile(captcha_path, await response.buffer());       
 
+    // console.log("HELLO",request.url());
+    // process.exit()
 
   }
   if(!page.searchDownload && request.url().includes("preparerRecherche-telechargementMouvements.ea")){
@@ -64,6 +93,7 @@ const fse = require('fs-extra');
 
     let text= await page.evaluate(url=>fetch(url).then(r=>r.text()),request.url())
     let form = new FormData();
+    text = await get_temp_virements_libelles(page,text)
     form.append('account_resume', text);
     let response = await fetch(process.argv[6], {method: 'POST', body: form});
     let data = await response.text();
@@ -98,8 +128,10 @@ const fse = require('fs-extra');
     [...pass].forEach(char=>{
       buttons[indexes.indexOf(char)].click();
     })
+    
     frames[0].window.document.querySelector("#valider").click();
   },process.argv[2],process.argv[3],goPython())
+  // await new Promise(z=>false)
   await page.waitForSelector('.account-data a');
   //await page.click(".amount-euro");
   await page.goto(await page.evaluate(z =>  document.querySelector(".account-data a").href))
