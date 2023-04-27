@@ -33,7 +33,7 @@ async function get_temp_virements_libelles(page,text)
       })
       await timeout(3000);        
       await page.evaluate(z=>{
-        [...document.querySelectorAll("a")].filter(a=>a.textContent.includes('exécutés'))[0].click()
+        [...document.querySelectorAll("a,h3")].filter(a=>a.textContent.includes('exécutés'))[0].click()
       })
       
       await timeout(3000);
