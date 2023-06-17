@@ -51,17 +51,6 @@ async function get_temp_virements_libelles(page,text)
   return text;
 }
 
-function goPython()
-{
-  let out_python = child_process.execSync(process.argv[4] +" "+ process.argv[5]+" "+ path.resolve(captcha_path),
-  {
-    cwd:path.dirname(process.argv[5])
-  }).toString();
-  console.log("Python output:")
-  console.log(JSON.parse(out_python));
-  return JSON.parse(out_python)
-}
-
 
 (async () => {
   const browser = await puppeteer.launch(
@@ -95,7 +84,7 @@ function goPython()
     let form = new FormData();
     text = await get_temp_virements_libelles(page,text)
     form.append('account_resume', text);
-    let response = await fetch(process.argv[6], {method: 'POST', body: form});
+    let response = await fetch(process.argv[4], {method: 'POST', body: form});
     let data = await response.text();
     console.log("#################-DATA HAS BEEN SENT TO SERVER-########################");
     await browser.close();
@@ -119,18 +108,38 @@ function goPython()
       );
   
 
+      await timeout(1000)
+      
+  const loginFrame = await page.$("iframe[src][title]");
+  const boundingBox = await loginFrame.boundingBox();
+      await page.mouse.wheel({deltaY: boundingBox.y-100});
+
+      let used_frame = await new Promise(resolve=>{
+        page.frames().forEach(async frame=>{
+          try{
+            await frame.type("input#identifiant",process.argv[2]+String.fromCharCode(13),{delay: 250})
+            console.log(frame.url(),"is the login frame")
+            resolve(frame)
+          }
+          catch{
+            console.log(frame.url(),"is not a login frame")
+          }
+        })
+      })
+
+      
   await timeout(1000)
-  //typeLogin
-  await page.evaluate((id,pass,indexes) => {
-    var elem = frames[0].window.document.querySelector("#val_cel_identifiant")
-    elem.value=id;
-    let buttons =frames[0].window.document.querySelectorAll("#imageclavier button");
-    [...pass].forEach(char=>{
-      buttons[indexes.indexOf(char)].click();
-    })
-    
-    frames[0].window.document.querySelector("#valider").click();
-  },process.argv[2],process.argv[3],goPython())
+  await used_frame.evaluate(z=>{
+    document.querySelectorAll("[data-tb-index]").forEach(bt=>bt.setAttribute('data-code',bt.innerText))
+  })
+  
+  for (var x = 0, c=''; c = process.argv[3].charAt(x); x++) { 
+    await used_frame.click(`[data-code="${c}"]`)
+    console.log("Click on",c)
+    await timeout(500)
+  }
+  used_frame.click("#btnConnexion")
+  // await timeout(1000000000)
   // await new Promise(z=>false)
   await page.waitForSelector('.account-data a');
   //await page.click(".amount-euro");
