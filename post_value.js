@@ -10,7 +10,7 @@ console.log(process.argv);
 
 let captcha_path="./captcha.png"
 settings = {
-  blank_profile: args.includes("--blank_profile")
+  blank_profile: process.argv.includes("--blank_profile")
 }
 if (!settings.blank_profile) {
         
