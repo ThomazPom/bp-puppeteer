@@ -140,7 +140,7 @@ async function get_temp_virements_libelles(page,text)
   }
   used_frame.click("#btnConnexion")
   // await timeout(1000000000)
-  // await new Promise(z=>false)
+  // await new Promise(z=>false)git 
   await page.waitForSelector('.account-data a');
   //await page.click(".amount-euro");
   await page.goto(await page.evaluate(z =>  document.querySelector(".account-data a").href))
