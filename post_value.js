@@ -6,12 +6,19 @@ import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 puppeteer.use(StealthPlugin())
 
-import  child_process from 'child_process';
 console.log(process.argv);
 
-import path from 'path';
 let captcha_path="./captcha.png"
-
+settings = {
+  blank_profile: args.includes("--blank_profile")
+}
+if (!settings.blank_profile) {
+        
+  let userDataDir = path.join(__dirname, "profile")
+  fs.mkdir(userDataDir, { recursive: true }, z => { })
+  launchArgs.userDataDir = userDataDir
+  
+}
 
 import fetch from 'node-fetch';
 import fse from 'fs-extra'
